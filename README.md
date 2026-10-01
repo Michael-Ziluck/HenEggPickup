@@ -20,13 +20,9 @@ The checks exercise the actual prefix/finalizer through Harmony against simulate
 
 ```powershell
 # Preview the target without changing the profile.
-
-**2.0.0 targets Valheim 1.0**, built and checked against 1.0.16. Use the 1.x releases for Ashlands.
 .\Deploy.ps1 -WhatIf
 
 # Build, check, package, and install into the r2modman Default profile.
-
-**2.0.0 targets Valheim 1.0**, built and checked against 1.0.16. Use the 1.x releases for Ashlands.
 .\Deploy.ps1 -Build
 ```
 
