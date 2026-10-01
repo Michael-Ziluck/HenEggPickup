@@ -9,6 +9,17 @@ actual game assemblies, and a checksum-pinned BepInExPack. No Steam login or gam
 stored in Git. References are cached; change `referenceRevision` in `dependencies.json` to refresh
 the game cache. The bootstrap rejects game versions outside Valheim 1.x.
 
+## Security analysis
+
+The `CodeQL` workflow runs extended C# and GitHub Actions security queries on pushes,
+pull requests, and a weekly schedule. C# uses a traced manual build after obtaining the
+same game and BepInEx references as the release build. It compiles only the production
+project, not the test projects containing simulated game types. This avoids the incomplete
+dependency resolution of GitHub's default no-build C# scan.
+
+GitHub CodeQL default setup must remain disabled because this repository uses advanced
+setup in `.github/workflows/codeql.yml`. Other security features remain enabled.
+
 ## Publication settings
 
 Repository variables:
