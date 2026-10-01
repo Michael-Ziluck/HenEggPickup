@@ -1,0 +1,38 @@
+[config]
+schemaVersion = "0.0.1"
+
+[package]
+namespace = "DocZee"
+name = "HenEggPickup"
+versionNumber = "1.0.0"
+description = "Automatically collect chicken eggs once enough adult hens are nearby. Client-side settings, no server sync."
+websiteUrl = "https://github.com/Michael-Ziluck/HenEggPickup"
+containsNsfwContent = false
+
+[package.dependencies]
+denikson-BepInExPack_Valheim = "5.4.2333"
+
+[build]
+icon = "./icon.png"
+readme = "./README.thunderstore.md"
+outdir = "./artifacts"
+
+[[build.copy]]
+source = "./bin/Release/net48/HenEggPickup.dll"
+target = "BepInEx/plugins/HenEggPickup/HenEggPickup.dll"
+
+[[build.copy]]
+source = "./LICENSE"
+target = "LICENSE"
+
+[[build.copy]]
+source = "./ATTRIBUTION.md"
+target = "ATTRIBUTION.md"
+
+[[build.copy]]
+source = "./CHANGELOG.md"
+target = "CHANGELOG.md"
+
+[publish]
+repository = "https://thunderstore.io"
+communities = ["valheim"]
