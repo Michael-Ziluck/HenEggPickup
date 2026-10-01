@@ -7,3 +7,5 @@ artifacts/
 .env
 .env.*
 *.zip
+.ci-game/
+.ci-downloads/

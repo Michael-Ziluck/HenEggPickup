@@ -1,53 +1,74 @@
 [CmdletBinding(SupportsShouldProcess)]
 param(
     [string]$PackageFile = '',
-    [string]$Repository = 'https://thunderstore.io',
-    [ValidatePattern('^[A-Za-z0-9_]+$')]
-    [string]$TeamName = 'DocZee'
+    [ValidateSet('Thunderstore', 'Hexium')][string]$Registry = 'Thunderstore',
+    [string]$Repository = '',
+    [ValidatePattern('^[A-Za-z0-9_]+$')][string]$TeamName = 'DocZee',
+    [switch]$SkipExisting
 )
 $ErrorActionPreference = 'Stop'
-if (!$PackageFile) {
-    $PackageFile = Get-ChildItem -LiteralPath (Join-Path $PSScriptRoot 'artifacts') -Filter 'HenEggPickup-*-Thunderstore.zip' |
-        Sort-Object LastWriteTime -Descending | Select-Object -First 1 -ExpandProperty FullName
+. (Join-Path $PSScriptRoot 'ci/Package-Manifest.ps1')
+$PackageFile = Resolve-Package $PackageFile $PSScriptRoot
+$manifest = Get-PackageManifest $PackageFile
+$expected = Get-Content (Join-Path $PSScriptRoot 'manifest.json') -Raw | ConvertFrom-Json
+if ($manifest.name -ne $expected.name) { throw 'ZIP belongs to a different mod.' }
+if (!$Repository) {
+    $Repository = if ($Registry -eq 'Hexium') { 'https://valheim.hexium.gg' } else { 'https://thunderstore.io' }
 }
-if (!$PackageFile -or !(Test-Path -LiteralPath $PackageFile -PathType Leaf)) {
-    throw 'Build a Thunderstore ZIP first, or pass -PackageFile.'
-}
-$PackageFile = (Resolve-Path -LiteralPath $PackageFile).Path
-Add-Type -AssemblyName System.IO.Compression.FileSystem
-$zip = [IO.Compression.ZipFile]::OpenRead($PackageFile)
-try {
-    foreach ($required in @('manifest.json', 'README.md', 'icon.png', 'BepInEx/plugins/HenEggPickup/HenEggPickup.dll')) {
-        if (!$zip.GetEntry($required)) { throw "Missing ZIP entry: $required" }
+$Repository = $Repository.TrimEnd('/')
+$id = "$TeamName/$($manifest.name)/$($manifest.version_number)"
+if ($SkipExisting) {
+    try {
+        $null = Invoke-RestMethod "$Repository/api/experimental/package/$id/" -TimeoutSec 30
+        Write-Host "$Registry already has $id; skipping immutable version."
+        return
+    } catch {
+        if (!$_.Exception.Response -or [int]$_.Exception.Response.StatusCode -ne 404) { throw }
     }
-    $reader = [IO.StreamReader]::new($zip.GetEntry('manifest.json').Open())
-    try { $manifest = $reader.ReadToEnd() | ConvertFrom-Json }
-    finally { $reader.Dispose() }
-} finally { $zip.Dispose() }
-if ($manifest.name -ne 'HenEggPickup' -or $manifest.version_number -notmatch '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$') {
-    throw 'ZIP does not contain a valid HenEggPickup manifest.'
 }
-$page = "$Repository/c/valheim/p/$TeamName/$($manifest.name)/"
 Write-Host "Package: $PackageFile"
-Write-Host "Destination: $page (version $($manifest.version_number))"
-if (!$PSCmdlet.ShouldProcess($page, "Publish version $($manifest.version_number) to Thunderstore")) { return }
+Write-Host "Destination: $Registry / $id"
+if (!$PSCmdlet.ShouldProcess("$Repository/$id", 'Publish package')) { return }
+$tokenName = if ($Registry -eq 'Hexium') { 'HEXIUM_API_TOKEN' } else { 'THUNDERSTORE_API_TOKEN' }
+$token = [Environment]::GetEnvironmentVariable($tokenName, 'Process')
+if ([string]::IsNullOrWhiteSpace($token)) { $token = [Environment]::GetEnvironmentVariable($tokenName, 'User') }
+if ([string]::IsNullOrWhiteSpace($token)) { throw "$tokenName is not set." }
 
-$token = $env:THUNDERSTORE_API_TOKEN
-if ([string]::IsNullOrWhiteSpace($token)) {
-    $token = [Environment]::GetEnvironmentVariable('THUNDERSTORE_API_TOKEN', 'User')
+$stage = Join-Path $PSScriptRoot ('.local/publish-' + [guid]::NewGuid().ToString('N'))
+New-Item -ItemType Directory -Path $stage -Force | Out-Null
+[IO.Compression.ZipFile]::ExtractToDirectory($PackageFile, $stage)
+# TCLI reads publication metadata from TOML. Generate it from this exact ZIP,
+# keeping future version bumps and dependencies consistent with the upload.
+function Toml-String($Value) { return ConvertTo-Json -InputObject ([string]$Value) -Compress }
+$config = @(
+    '[config]', 'schemaVersion = "0.0.1"', '[package]',
+    "namespace = $(Toml-String $TeamName)", "name = $(Toml-String $manifest.name)",
+    "versionNumber = $(Toml-String $manifest.version_number)",
+    "description = $(Toml-String $manifest.description)", "websiteUrl = $(Toml-String $manifest.website_url)",
+    'containsNsfwContent = false', '[package.dependencies]'
+)
+foreach ($dependency in $manifest.dependencies) {
+    if ($dependency -notmatch '^([A-Za-z0-9_]+-[A-Za-z0-9_]+)-(\d+\.\d+\.\d+)$') { throw "Invalid dependency: $dependency" }
+    $config += "$(Toml-String $Matches[1]) = $(Toml-String $Matches[2])"
 }
-if ([string]::IsNullOrWhiteSpace($token)) { throw 'THUNDERSTORE_API_TOKEN is not set.' }
+$config += @('[build]', 'icon = "./icon.png"', 'readme = "./README.md"', 'outdir = "./output"',
+    '[[build.copy]]', 'source = "./BepInEx"', 'target = "BepInEx"',
+    '[publish]', "repository = $(Toml-String $Repository)", 'communities = ["valheim"]')
+$configPath = Join-Path $stage 'thunderstore.toml'
+$config | Set-Content -LiteralPath $configPath -Encoding utf8
 $previousToken = $env:TCLI_AUTH_TOKEN
+$previousRollForward = $env:DOTNET_ROLL_FORWARD
 Push-Location $PSScriptRoot
 try {
     & dotnet tool restore
     if ($LASTEXITCODE -ne 0) { throw 'Thunderstore CLI restore failed.' }
     $env:TCLI_AUTH_TOKEN = $token
-    & dotnet tool run tcli -- publish --file $PackageFile --config-path (Join-Path $PSScriptRoot 'thunderstore.toml') `
-        --repository $Repository --package-namespace $TeamName --package-name $manifest.name --package-version $manifest.version_number
-    if ($LASTEXITCODE -ne 0) { throw "Thunderstore publish failed with exit code $LASTEXITCODE." }
-    Write-Host "Published: $page"
+    $env:DOTNET_ROLL_FORWARD = 'Major'
+    & dotnet tool run tcli -- publish --file $PackageFile --config-path $configPath
+    if ($LASTEXITCODE -ne 0) { throw "$Registry publish failed with exit code $LASTEXITCODE." }
+    Write-Host "Published $id to $Registry."
 } finally {
     $env:TCLI_AUTH_TOKEN = $previousToken
+    $env:DOTNET_ROLL_FORWARD = $previousRollForward
     Pop-Location
 }

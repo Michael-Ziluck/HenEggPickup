@@ -11,5 +11,6 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Check build failed' }
     & (Join-Path $PSScriptRoot 'tests/Checks/bin/Release/net48/Checks.exe') $GamePath (Join-Path $PSScriptRoot 'bin/Release/net48/HenEggPickup.dll')
     if ($LASTEXITCODE -ne 0) { throw 'Checks failed' }
+    & (Join-Path $PSScriptRoot 'ci/Verify-References.ps1') -GamePath $GamePath -PluginPath (Join-Path $PSScriptRoot 'bin/Release/net48/HenEggPickup.dll')
     & (Join-Path $PSScriptRoot 'Package.ps1') -OutputDirectory $OutputDirectory
 } finally { Pop-Location }
