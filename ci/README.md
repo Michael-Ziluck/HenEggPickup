@@ -28,7 +28,7 @@ Repository variables:
 | --- | --- | --- |
 | RELEASE_PUBLISH_ENABLED | true | Create `vX.Y.Z` GitHub releases with the ZIP. |
 | THUNDERSTORE_PUBLISH_ENABLED | true | Upload new versions to DocZee on Thunderstore. |
-| HEXIUM_PUBLISH_ENABLED | false initially | Enable only after DocZee approval and API-token setup. |
+| HEXIUM_PUBLISH_ENABLED | true | Upload new versions to DocZee on Hexium. |
 
 Repository secrets:
 
@@ -38,8 +38,7 @@ Repository secrets:
 Packages use the Valheim community. Both registries receive the same built ZIP, with metadata
 derived from its manifest. Hexium's API documents Thunderstore-compatible upload endpoints;
 `ci/Publish-Hexium.ps1` uses the same pinned CLI against `https://valheim.hexium.gg`.
-Hexium publishing is scaffolded and disabled while the team is pending approval; the first actual
-upload still needs verification once approval and a token are available.
+Hexium publication uses the DocZee team token stored in the HEXIUM_API_TOKEN repository secret.
 
 ## Release a change
 

@@ -36,7 +36,7 @@ Install on each client that wants this behavior. Installing only on a dedicated 
 ## Check out my other mods
 
 - [Animal Feed Guard](https://thunderstore.io/c/valheim/p/DocZee/AnimalFeedGuard/)
-- [Ranching - Chick Addon](https://thunderstore.io/c/valheim/p/DocZee/Ranching_Chick_Addon/)
+- [RanchingChickAddon](https://thunderstore.io/c/valheim/p/DocZee/RanchingChickAddon/)
 
 If you'd like to support ongoing modding work, [Ko-fi](https://ko-fi.com/doczee) is available.
 
