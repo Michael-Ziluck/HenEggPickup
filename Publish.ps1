@@ -19,7 +19,11 @@ $Repository = $Repository.TrimEnd('/')
 $id = "$TeamName/$($manifest.name)/$($manifest.version_number)"
 if ($SkipExisting) {
     try {
-        $null = Invoke-RestMethod "$Repository/api/experimental/package/$id/" -TimeoutSec 30
+        if ($Registry -eq 'Thunderstore') {
+            $null = Invoke-WebRequest "$Repository/package/download/$id/" -Method Head -TimeoutSec 30
+        } else {
+            $null = Invoke-RestMethod "$Repository/api/experimental/package/$id/" -TimeoutSec 30
+        }
         Write-Host "$Registry already has $id; skipping immutable version."
         return
     } catch {
