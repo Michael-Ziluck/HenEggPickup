@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.1
+
+- Replace the chick icon with Valheim's chicken egg artwork.
+- Move build, package, publish, and deployment scripts into `ci` and normalize `tests/checks`.
+- Add repository sponsorship links and automatic dependency update checks.
+
 ## 2.0.0
 
 - Formally target Valheim 1.0; compiled and checked against 1.0.16.

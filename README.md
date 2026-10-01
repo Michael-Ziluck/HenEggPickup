@@ -1,6 +1,6 @@
 # Hen Egg Pickup
 
-**2.0.0 targets Valheim 1.0**, built and checked against 1.0.16. Use the 1.x releases for Ashlands.
+**2.x targets Valheim 1.0**, built and checked against 1.0.16. Use the 1.x releases for Ashlands.
 
 A client-side Valheim mod that enables chicken egg automatic pickup once enough living adult hens are near the player. Defaults: 12 hens within 10 metres. All settings are local; there is no ServerSync or server-side requirement.
 
@@ -67,7 +67,7 @@ The threshold applies to the player, not to each egg or pen. Loaded hens across 
 
 If you'd like to support ongoing modding work, [Ko-fi](https://ko-fi.com/doczee) is available.
 
-Original code is MIT licensed. The reused Valheim chick icon is separately attributed in `ATTRIBUTION.md`.
+Original code is MIT licensed. The reused Valheim egg icon is separately attributed in `ATTRIBUTION.md`.
 
 ## Automated builds and releases
 

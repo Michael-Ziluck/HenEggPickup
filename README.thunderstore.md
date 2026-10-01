@@ -1,6 +1,6 @@
 # Hen Egg Pickup
 
-**2.0.0 targets Valheim 1.0**, built and checked against 1.0.16. Use the 1.x releases for Ashlands.
+**2.x targets Valheim 1.0**, built and checked against 1.0.16. Use the 1.x releases for Ashlands.
 
 Automatically collect chicken eggs when your flock has enough adult hens nearby.
 
