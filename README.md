@@ -1,5 +1,7 @@
 # Hen Egg Pickup
 
+**2.0.0 targets Valheim 1.0**, built and checked against 1.0.16. Use the 1.x releases for Ashlands.
+
 A client-side Valheim mod that enables chicken egg automatic pickup once enough living adult hens are near the player. Defaults: 12 hens within 10 metres. All settings are local; there is no ServerSync or server-side requirement.
 
 See [the mod page README](README.thunderstore.md) for settings and behavior.
@@ -18,9 +20,13 @@ The checks exercise the actual prefix/finalizer through Harmony against simulate
 
 ```powershell
 # Preview the target without changing the profile.
+
+**2.0.0 targets Valheim 1.0**, built and checked against 1.0.16. Use the 1.x releases for Ashlands.
 .\Deploy.ps1 -WhatIf
 
 # Build, check, package, and install into the r2modman Default profile.
+
+**2.0.0 targets Valheim 1.0**, built and checked against 1.0.16. Use the 1.x releases for Ashlands.
 .\Deploy.ps1 -Build
 ```
 

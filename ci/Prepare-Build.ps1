@@ -39,8 +39,18 @@ if (!(Test-Path -LiteralPath (Join-Path $managed 'assembly_valheim.dll'))) {
         $steamDir = Join-Path $downloads 'steamcmd'
         Expand-Archive -LiteralPath $steamArchive -DestinationPath $steamDir -Force
         $serverDir = Join-Path $downloads 'server'
-        & (Join-Path $steamDir 'steamcmd.exe') +force_install_dir $serverDir +login anonymous +app_update $deps.steamcmd.serverAppId validate +quit
-        if ($LASTEXITCODE -ne 0) { throw "SteamCMD failed: $LASTEXITCODE" }
+        # Fresh SteamCMD installations can have incomplete app metadata. Refresh it
+        # explicitly, select the public branch, and allow bounded download retries.
+        Push-Location $steamDir
+        try {
+            for ($attempt = 1; $attempt -le 3; $attempt++) {
+                & (Join-Path $steamDir 'steamcmd.exe') +force_install_dir $serverDir +login anonymous +app_info_update 1 +app_update $deps.steamcmd.serverAppId -beta public validate +quit
+                if ($LASTEXITCODE -eq 0 -and (Test-Path (Join-Path $serverDir 'valheim_server_Data/Managed/assembly_valheim.dll'))) { break }
+                if ($attempt -eq 3) { throw "SteamCMD failed after $attempt attempts (exit $LASTEXITCODE)." }
+                Write-Host "SteamCMD download incomplete; retrying ($attempt/3)."
+                Start-Sleep -Seconds 5
+            }
+        } finally { Pop-Location }
         $sourceManaged = Join-Path $serverDir 'valheim_server_Data/Managed'
     }
     if (!(Test-Path -LiteralPath (Join-Path $sourceManaged 'assembly_valheim.dll'))) { throw 'Valheim game assemblies were not obtained.' }

@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace HenEggPickup;
 
-[BepInPlugin(Guid, "Hen Egg Pickup", "1.0.0")]
+[BepInPlugin(Guid, "Hen Egg Pickup", "2.0.0")]
 public sealed class Plugin : BaseUnityPlugin
 {
     public const string Guid = "com.ziluck.valheim.heneggpickup";

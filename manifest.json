@@ -1,7 +1,7 @@
 {
   "name": "HenEggPickup",
-  "version_number": "1.0.0",
+  "version_number": "2.0.0",
   "website_url": "https://github.com/Michael-Ziluck/HenEggPickup",
   "description": "Automatically collect chicken eggs once enough adult hens are nearby. Configurable flock size and detection radius. Client-side settings, no server sync, and manual pickup preserved.",
-  "dependencies": ["denikson-BepInExPack_Valheim-5.4.2333"]
+  "dependencies": ["denikson-BepInExPack_Valheim-5.4.2350"]
 }
