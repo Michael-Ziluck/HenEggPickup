@@ -26,7 +26,7 @@ Repository secrets:
 
 Packages use the Valheim community. Both registries receive the same built ZIP, with metadata
 derived from its manifest. Hexium's API documents Thunderstore-compatible upload endpoints;
-`Publish-Hexium.ps1` uses the same pinned CLI against `https://valheim.hexium.gg`.
+`ci/Publish-Hexium.ps1` uses the same pinned CLI against `https://valheim.hexium.gg`.
 Hexium publishing is scaffolded and disabled while the team is pending approval; the first actual
 upload still needs verification once approval and a token are available.
 
@@ -44,9 +44,9 @@ rerun on `main` to publish the current version there without republishing Thunde
 Local commands:
 
 ```powershell
-./Build.ps1
-./Publish.ps1 -WhatIf
-./Publish-Hexium.ps1 -WhatIf
+./ci/Build.ps1
+./ci/Publish.ps1 -WhatIf
+./ci/Publish-Hexium.ps1 -WhatIf
 ```
 
 References: [GitHub Actions](https://docs.github.com/en/actions),

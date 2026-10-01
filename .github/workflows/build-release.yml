@@ -32,7 +32,7 @@ jobs:
         run: ./ci/Prepare-Build.ps1
       - name: Build, verify, and package
         shell: pwsh
-        run: ./Build.ps1 -GamePath $env:VALHEIM_BUILD_PATH
+        run: ./ci/Build.ps1 -GamePath $env:VALHEIM_BUILD_PATH
       - name: Identify package
         id: package
         shell: pwsh
@@ -87,7 +87,7 @@ jobs:
         env:
           THUNDERSTORE_API_TOKEN: ${{ secrets.THUNDERSTORE_API_TOKEN }}
           PACKAGE_FILE: artifacts/${{ needs.build.outputs.package }}
-        run: ./Publish.ps1 -PackageFile $env:PACKAGE_FILE -SkipExisting
+        run: ./ci/Publish.ps1 -PackageFile $env:PACKAGE_FILE -SkipExisting
 
   hexium:
     needs: build
@@ -107,4 +107,4 @@ jobs:
         env:
           HEXIUM_API_TOKEN: ${{ secrets.HEXIUM_API_TOKEN }}
           PACKAGE_FILE: artifacts/${{ needs.build.outputs.package }}
-        run: ./Publish-Hexium.ps1 -PackageFile $env:PACKAGE_FILE -SkipExisting
+        run: ./ci/Publish-Hexium.ps1 -PackageFile $env:PACKAGE_FILE -SkipExisting

@@ -5,10 +5,11 @@ param(
     [switch]$Build
 )
 $ErrorActionPreference = 'Stop'
+$root = Split-Path $PSScriptRoot -Parent
 if ($Build) {
     & (Join-Path $PSScriptRoot 'Build.ps1') -GamePath $GamePath
 }
-$dll = Join-Path $PSScriptRoot 'bin/Release/net48/HenEggPickup.dll'
+$dll = Join-Path $root 'bin/Release/net48/HenEggPickup.dll'
 if (!(Test-Path -LiteralPath $dll -PathType Leaf)) { throw 'Build Release first, or pass -Build.' }
 $plugins = Join-Path $ProfilePath 'BepInEx/plugins'
 if (!(Test-Path -LiteralPath $plugins -PathType Container)) { throw "Not an existing BepInEx profile: $ProfilePath" }
@@ -20,7 +21,7 @@ if (Get-Process -Name valheim -ErrorAction SilentlyContinue) { throw 'Exit Valhe
 
 $backup = $null
 if (Test-Path -LiteralPath $target -PathType Leaf) {
-    $backupDir = Join-Path $PSScriptRoot '.local/deploy-backups'
+    $backupDir = Join-Path $root '.local/deploy-backups'
     New-Item -ItemType Directory -Path $backupDir -Force | Out-Null
     $backup = Join-Path $backupDir ("HenEggPickup-{0}-{1}.dll" -f (Get-Date -Format 'yyyyMMdd-HHmmss'), [guid]::NewGuid().ToString('N'))
     Copy-Item -LiteralPath $target -Destination $backup

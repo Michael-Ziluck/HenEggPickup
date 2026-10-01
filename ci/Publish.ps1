@@ -7,10 +7,11 @@ param(
     [switch]$SkipExisting
 )
 $ErrorActionPreference = 'Stop'
-. (Join-Path $PSScriptRoot 'ci/Package-Manifest.ps1')
-$PackageFile = Resolve-Package $PackageFile $PSScriptRoot
+$root = Split-Path $PSScriptRoot -Parent
+. (Join-Path $PSScriptRoot 'Package-Manifest.ps1')
+$PackageFile = Resolve-Package $PackageFile $root
 $manifest = Get-PackageManifest $PackageFile
-$expected = Get-Content (Join-Path $PSScriptRoot 'manifest.json') -Raw | ConvertFrom-Json
+$expected = Get-Content (Join-Path $root 'manifest.json') -Raw | ConvertFrom-Json
 if ($manifest.name -ne $expected.name) { throw 'ZIP belongs to a different mod.' }
 if (!$Repository) {
     $Repository = if ($Registry -eq 'Hexium') { 'https://valheim.hexium.gg' } else { 'https://thunderstore.io' }
@@ -38,7 +39,7 @@ $token = [Environment]::GetEnvironmentVariable($tokenName, 'Process')
 if ([string]::IsNullOrWhiteSpace($token)) { $token = [Environment]::GetEnvironmentVariable($tokenName, 'User') }
 if ([string]::IsNullOrWhiteSpace($token)) { throw "$tokenName is not set." }
 
-$stage = Join-Path $PSScriptRoot ('.local/publish-' + [guid]::NewGuid().ToString('N'))
+$stage = Join-Path $root ('.local/publish-' + [guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $stage -Force | Out-Null
 [IO.Compression.ZipFile]::ExtractToDirectory($PackageFile, $stage)
 # TCLI reads publication metadata from TOML. Generate it from this exact ZIP,
@@ -62,7 +63,7 @@ $configPath = Join-Path $stage 'thunderstore.toml'
 $config | Set-Content -LiteralPath $configPath -Encoding utf8
 $previousToken = $env:TCLI_AUTH_TOKEN
 $previousRollForward = $env:DOTNET_ROLL_FORWARD
-Push-Location $PSScriptRoot
+Push-Location $root
 try {
     & dotnet tool restore
     if ($LASTEXITCODE -ne 0) { throw 'Thunderstore CLI restore failed.' }

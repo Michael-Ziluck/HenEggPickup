@@ -9,7 +9,7 @@ See [the mod page README](README.thunderstore.md) for settings and behavior.
 ## Build and package
 
 ```powershell
-.\Build.ps1
+.\ci/Build.ps1
 ```
 
 An alternate game location can be supplied with `-GamePath`. The build uses your installed game's BepInEx and managed assemblies. It produces a validated Thunderstore ZIP under `artifacts/`, using `README.thunderstore.md` as the package README. AutoPicker and Animal Feed Guard are optional at build time and runtime.
@@ -20,10 +20,10 @@ The checks exercise the actual prefix/finalizer through Harmony against simulate
 
 ```powershell
 # Preview the target without changing the profile.
-.\Deploy.ps1 -WhatIf
+.\ci/Deploy.ps1 -WhatIf
 
 # Build, check, package, and install into the r2modman Default profile.
-.\Deploy.ps1 -Build
+.\ci/Deploy.ps1 -Build
 ```
 
 Exit Valheim before deployment. Use `-ProfilePath` to select another profile and `-GamePath`
@@ -33,12 +33,12 @@ and keeps any previous DLL under `.local/deploy-backups/`. Configuration files s
 ## Publish to Thunderstore
 
 ```powershell
-.\Build.ps1
-.\Publish.ps1 -WhatIf
-.\Publish.ps1
+.\ci/Build.ps1
+.\ci/Publish.ps1 -WhatIf
+.\ci/Publish.ps1
 ```
 
-`Publish.ps1` uploads the packaged ZIP to the **DocZee** team in the **Valheim** community.
+`ci/Publish.ps1` uploads the packaged ZIP to the **DocZee** team in the **Valheim** community.
 It reads the package name and version from the ZIP, so it also works for future releases.
 Use `-PackageFile` to select a specific ZIP. `-WhatIf` validates the package and previews the upload.
 The script restores the pinned local Thunderstore CLI and reads `THUNDERSTORE_API_TOKEN`
