@@ -24,7 +24,7 @@ setup in `.github/workflows/codeql.yml`. Other security features remain enabled.
 
 Repository variables:
 
-| Variable | Value | Purpose |
+| Variable | Set to | Purpose |
 | --- | --- | --- |
 | RELEASE_PUBLISH_ENABLED | true | Create `vX.Y.Z` GitHub releases with the ZIP. |
 | THUNDERSTORE_PUBLISH_ENABLED | true | Upload new versions to DocZee on Thunderstore. |

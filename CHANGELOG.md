@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Name saved egg pickup flags and player positions explicitly.
+- Test mixed original flags, exception restoration across multiple eggs, and plugin teardown.
+- Keep the simulated game's pickup range check independent of the mod's radius helper.
+
 ## 2.0.1
 
 - Replace the chick icon with Valheim's chicken egg artwork.

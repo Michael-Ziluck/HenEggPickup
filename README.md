@@ -63,7 +63,7 @@ The threshold applies to the player, not to each egg or pen. Loaded hens across 
 ## Other mods
 
 - [Animal Feed Guard](https://thunderstore.io/c/valheim/p/DocZee/AnimalFeedGuard/)
-- [RanchingChickAddon](https://thunderstore.io/c/valheim/p/DocZee/RanchingChickAddon/)
+- [RanchingAddon](https://github.com/Michael-Ziluck/RanchingAddon)
 
 If you'd like to support ongoing modding work, [Ko-fi](https://ko-fi.com/doczee) is available.
 
@@ -71,4 +71,4 @@ Original code is MIT licensed. The reused Valheim egg icon is separately attribu
 
 ## Automated builds and releases
 
-See [ci/README.md](ci/README.md) for GitHub Actions builds, versioned releases, and automatic publishing to Thunderstore and Hexium. Builds run on each commit to `main`; Hexium publishing is disabled pending team approval.
+See [ci/README.md](ci/README.md) for GitHub Actions builds, versioned releases, and automatic publishing to Thunderstore and Hexium. Pull requests run build checks. Publishing jobs run from `main` when the corresponding repository variable is enabled.
