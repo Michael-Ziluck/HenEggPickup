@@ -14,7 +14,7 @@ if ($LASTEXITCODE -eq 0) {
     return
 }
 $changelog = Get-Content (Join-Path (Split-Path $PSScriptRoot -Parent) 'CHANGELOG.md') -Raw
-$notes = [regex]::Match($changelog, '(?ms)^## ' + [regex]::Escape($manifest.version_number) + '\s*\r?\n(.*?)(?=^## |\z)').Groups[1].Value.Trim()
+$notes = [regex]::Match($changelog, '(?ms)^## ' + [regex]::Escape($manifest.version_number) + '(?: - \d{4}-\d{2}-\d{2})?[ \t]*\r?\n(.*?)(?=^## |\z)').Groups[1].Value.Trim()
 if (!$notes) { throw 'Add release notes to CHANGELOG.md before publishing.' }
 $notesPath = Join-Path $env:RUNNER_TEMP 'release-notes.md'
 $notes | Set-Content $notesPath -Encoding utf8
