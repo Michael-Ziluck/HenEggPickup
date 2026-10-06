@@ -41,22 +41,27 @@ public sealed class Plugin : BaseUnityPlugin
 
     private static bool HasEnoughHens(Player player)
     {
-        int count = 0;
-        Vector3 origin = player.transform.position;
+        int henCount = 0;
+        Vector3 playerPosition = player.transform.position;
         foreach (Character character in Character.GetAllCharacters())
         {
             if (!character || character.IsDead() || Utils.GetPrefabName(character.gameObject) != "Hen") continue;
-            if (!EggRules.WithinRadius((character.transform.position - origin).sqrMagnitude, henRadius.Value)) continue;
-            if (++count >= minimumHens.Value) return true;
+            if (!EggRules.WithinRadius((character.transform.position - playerPosition).sqrMagnitude, henRadius.Value)) continue;
+            if (++henCount >= minimumHens.Value) return true;
         }
         return false;
     }
 
     internal readonly struct PickupFlag
     {
-        internal readonly ItemDrop Item;
-        internal readonly bool Original;
-        internal PickupFlag(ItemDrop item) { Item = item; Original = item.m_autoPickup; }
+        internal readonly ItemDrop Egg;
+        internal readonly bool OriginalAutoPickup;
+
+        internal PickupFlag(ItemDrop egg)
+        {
+            Egg = egg;
+            OriginalAutoPickup = egg.m_autoPickup;
+        }
     }
 
     // Scope the flag override to the local automatic pickup call. This leaves
@@ -73,16 +78,16 @@ public sealed class Plugin : BaseUnityPlugin
             var drops = Instances.GetValue(null) as List<ItemDrop>;
             if (drops == null) return;
             bool? canCollect = null;
-            Vector3 origin = __instance.transform.position + Vector3.up;
-            foreach (ItemDrop item in drops)
+            Vector3 pickupOrigin = __instance.transform.position + Vector3.up;
+            foreach (ItemDrop egg in drops)
             {
-                if (!item || !EggRules.IsChickenEgg(Utils.GetPrefabName(item.gameObject))) continue;
-                if (!EggRules.WithinRadius((item.transform.position - origin).sqrMagnitude, __instance.m_autoPickupRange)) continue;
+                if (!egg || !EggRules.IsChickenEgg(Utils.GetPrefabName(egg.gameObject))) continue;
+                if (!EggRules.WithinRadius((egg.transform.position - pickupOrigin).sqrMagnitude, __instance.m_autoPickupRange)) continue;
                 canCollect ??= HasEnoughHens(__instance);
-                if (item.m_autoPickup == canCollect.Value) continue;
+                if (egg.m_autoPickup == canCollect.Value) continue;
                 __state ??= new List<PickupFlag>();
-                __state.Add(new PickupFlag(item));
-                item.m_autoPickup = canCollect.Value;
+                __state.Add(new PickupFlag(egg));
+                egg.m_autoPickup = canCollect.Value;
             }
         }
 
@@ -91,7 +96,7 @@ public sealed class Plugin : BaseUnityPlugin
         {
             if (__state != null)
                 foreach (PickupFlag saved in __state)
-                    if (saved.Item) saved.Item.m_autoPickup = saved.Original;
+                    if (saved.Egg) saved.Egg.m_autoPickup = saved.OriginalAutoPickup;
             return __exception;
         }
     }
