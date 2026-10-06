@@ -66,6 +66,19 @@ internal static class Program
         try { player.AutoPickup(.02f); throw new Exception("exception was swallowed"); }
         catch (InvalidOperationException e) { Check(e.Message == "simulated pickup failure" && !egg.m_autoPickup, "exception propagates and flag restores"); }
         player.ThrowDuringPickup = false;
+        Reset(); Flock(12);
+        var firstEgg = Egg(); var enabledEgg = Egg(flag: true); var lastEgg = Egg();
+        player.AutoPickup(.02f);
+        Check(firstEgg.Collected && enabledEgg.Collected && lastEgg.Collected, "all nearby eggs use the same flock threshold");
+        Check(!firstEgg.m_autoPickup && enabledEgg.m_autoPickup && !lastEgg.m_autoPickup, "mixed original flags restore independently");
+        Reset(); Flock(12); egg = Egg(); var untouchedEgg = Egg(flag: true); var changedEgg = Egg();
+        player.ThrowDuringPickup = true;
+        try { player.AutoPickup(.02f); throw new Exception("exception was swallowed"); }
+        catch (InvalidOperationException)
+        {
+            Check(!egg.m_autoPickup && untouchedEgg.m_autoPickup && !changedEgg.m_autoPickup, "exception restores every changed egg, including later unvisited eggs");
+        }
+        player.ThrowDuringPickup = false;
         var filter = new Harmony("checks.feedguard");
         filter.Patch(AccessTools.Method(typeof(Player), nameof(Player.AutoPickup)), transpiler: new HarmonyMethod(typeof(Program), nameof(FeedFilter)), prefix: new HarmonyMethod(typeof(Program), nameof(SkipPickup)));
         egg.FilterBlocked = true; player.AutoPickup(.02f); Check(!egg.Collected && !egg.m_autoPickup, "existing pickup filter respected");
@@ -73,6 +86,10 @@ internal static class Program
         player.AutoPickup(.02f); Check(egg.Collected && !egg.m_autoPickup, "works with feed-style transpiler installed");
         filter.UnpatchSelf();
         Check(!EggRules.WithinRadius(float.NaN, 10) && !EggRules.WithinRadius(-1, 10), "invalid distances rejected");
+        Check(!EggRules.IsChickenEgg(null) && !EggRules.IsChickenEgg("chickenegg"), "only the exact chicken egg prefab matches");
+        typeof(Plugin).GetMethod("OnDestroy", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(plugin, null);
+        Reset(); Flock(12); egg = Egg(); player.AutoPickup(.02f);
+        Check(!egg.Collected && !egg.m_autoPickup, "plugin destruction removes its pickup patches");
         using (var game = Mono.Cecil.AssemblyDefinition.ReadAssembly(Path.Combine(args[0], "valheim_Data", "Managed", "assembly_valheim.dll")))
         {
             var itemType = game.MainModule.Types.Single(t => t.Name == "ItemDrop");

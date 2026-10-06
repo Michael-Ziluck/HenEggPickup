@@ -78,7 +78,9 @@ public class Player : Character
         {
             if (!item.m_autoPickup) continue;
             if (ThrowDuringPickup) throw new InvalidOperationException("simulated pickup failure");
-            if (!FullInventory && HenEggPickup.EggRules.WithinRadius((item.transform.position - (transform.position + UnityEngine.Vector3.up)).sqrMagnitude, m_autoPickupRange))
+            // Model the game's range check independently of the mod's EggRules.
+            float squaredDistance = (item.transform.position - (transform.position + UnityEngine.Vector3.up)).sqrMagnitude;
+            if (!FullInventory && squaredDistance <= m_autoPickupRange * m_autoPickupRange)
                 item.Collected = true;
         }
     }
