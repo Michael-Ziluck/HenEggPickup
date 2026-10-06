@@ -4,7 +4,7 @@ schemaVersion = "0.0.1"
 [package]
 namespace = "DocZee"
 name = "HenEggPickup"
-versionNumber = "2.0.1"
+versionNumber = "2.0.2"
 description = "Automatically collect chicken eggs once enough adult hens are nearby. Client-side settings, no server sync."
 websiteUrl = "https://github.com/Michael-Ziluck/HenEggPickup"
 containsNsfwContent = false

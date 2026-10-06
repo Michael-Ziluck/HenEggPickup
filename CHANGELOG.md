@@ -1,10 +1,11 @@
 # Changelog
 
-## Unreleased
+## 2.0.2 - 2026-10-06
 
 - Name saved egg pickup flags and player positions explicitly.
 - Test mixed original flags, exception restoration across multiple eggs, and plugin teardown.
 - Keep the simulated game's pickup range check independent of the mod's radius helper.
+- Maintainer confirmed the current build works as intended in game.
 
 ## 2.0.1
 
